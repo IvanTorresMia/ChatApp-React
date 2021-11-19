@@ -8,27 +8,28 @@ const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 });
 
+// instalce of sockdt io
 const socket = io();
 
-// Join chatroom
+// Join chatroom and send the current user and the room that is being chosen
 socket.emit('joinRoom', { username, room });
 
-// Get room and users
+// Get room and users getting all the users in that room
 socket.on('roomUsers', ({ room, users }) => {
   outputRoomName(room);
   outputUsers(users);
 });
 
-// Message from server
+// Message from server the message to be appended to the dom ? 
 socket.on('message', (message) => {
   console.log(message);
   outputMessage(message);
 
-  // Scroll down
+  // Scroll down after message is appended scroll down
   chatMessages.scrollTop = chatMessages.scrollHeight;
 });
 
-// Message submit
+// Message submit this will handle the submit when the mesage is being submitted
 chatForm.addEventListener('submit', (e) => {
   e.preventDefault();
 
