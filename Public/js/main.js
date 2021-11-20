@@ -36,6 +36,8 @@ chatForm.addEventListener('submit', (e) => {
   // Get message text
   let msg = e.target.elements.msg.value;
 
+
+  // deletes spaces from the beginning and the end
   msg = msg.trim();
 
   if (!msg) {
@@ -43,6 +45,7 @@ chatForm.addEventListener('submit', (e) => {
   }
 
   // Emit message to server
+  // sending the message back to the emit
   socket.emit('chatMessage', msg);
 
   // Clear input
