@@ -10,7 +10,7 @@ const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true,
 });
 
-// instalce of sockdt io
+// instalce of sockdt io. we have access to this because of the script tag that we added. 
 const socket = io();
 
 // Join chatroom and send the current user and the room that is being chosen
@@ -61,6 +61,7 @@ function outputMessage(message) {
   div.classList.add('message');
   const p = document.createElement('p');
   p.classList.add('meta');
+  p.innerText = message
   p.innerText = message.username;
   p.innerHTML += `<span>${message.time}</span>`;
   div.appendChild(p);
