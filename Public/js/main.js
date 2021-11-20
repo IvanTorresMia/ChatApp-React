@@ -1,3 +1,5 @@
+
+// global hooks including the chat room, the messages contaiers and room name as we will append stuff to here
 const chatForm = document.getElementById('chat-form');
 const chatMessages = document.querySelector('.chat-messages');
 const roomName = document.getElementById('room-name');
@@ -53,7 +55,7 @@ chatForm.addEventListener('submit', (e) => {
   e.target.elements.msg.focus();
 });
 
-// Output message to DOM
+// function to take in the new message and out put it to the chat app
 function outputMessage(message) {
   const div = document.createElement('div');
   div.classList.add('message');
