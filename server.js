@@ -44,11 +44,11 @@ io.on("connect", (socket) => {
       );
   });
 
-  // Broadcast when a user connects
-  io.to(user.room).emit("roomUsers", {
-    room: user.room,
-    users: getRoomUsers(user.room),
-  });
+  // // Broadcast when a user connects
+  // io.to(user.room).emit("roomUsers", {
+  //   room: user.room,
+  //   users: getRoomUsers(user.room),
+  // });
 
   // listen for chat message
   socket.on("chatMessage", (msg) => {
