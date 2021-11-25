@@ -1,24 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import socketIOClient from "socket.io-client";
 
-const ChatRoom = () => {
-
-  const [users, setUsers] = useState([]);
-
-  const socket = socketIOClient.connect("http://localhost:4200");
-  useEffect(() => {
-    socket.on("roomUsers", ({ room, users }) => {
-      console.log(users);
-      // setUsers(users)
-      
-    }); 
-  }, []);
-
-  // const showUsers = () => {
-  //   console.log(users);
-  // }
-
-
+const ChatRoom = ({room, users}) => {
 
 
   return (
@@ -61,7 +44,6 @@ const ChatRoom = () => {
           <button className="btn">
             <i className="fas fa-paper-plane"></i> Send
           </button>
-          {/* <button onClick={showUsers} >click me</button> */}
         </form>
       </div>
     </div>
