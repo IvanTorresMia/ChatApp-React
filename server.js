@@ -60,8 +60,16 @@ io.on("connect", (socket) => {
       users: getRoomUsers(user.room),
     });
 
+//   // Broadcast when a user connects
+//   io.to(user.room).emit("roomUsers", {
+//     room: user.room,
+//     users: getRoomUsers(user.room),
+//   });
 
   });
+
+
+
 
  
   socket.on("chatMessage", (msg) => {
