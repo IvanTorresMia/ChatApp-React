@@ -23,6 +23,7 @@ const io = socketio(server, {
 
 const PORT = 4200 || process.env.PORT;
 
+// commented out access to public folder incase needed
 // set static folder
 // app.use(express.static(path.join(__dirname, "public")));
 if (process.env.NODE_ENV === "production") {
@@ -36,14 +37,11 @@ const botName = "ChatCord Bot";
 io.on("connect", (socket) => {
   console.log("new socket connection");
   socket.on("joinRoom", ({ username, room }) => {
-    console.log(room, username);
     // here we are using the userJoin function from the user file
     // we are passing in the socket id username and room
     // this is where I would make a model and back end for this
     const user = userJoin(socket.id, username, room);
     socket.join(user.room);
-    // console.log("here");
-    // console.log(user);
 
     // after the user joins we emmit a message
     socket.emit("message", formatMessage(botName, "Welcome to the chat"));
@@ -59,26 +57,13 @@ io.on("connect", (socket) => {
       room: user.room,
       users: getRoomUsers(user.room),
     });
-
-//   // Broadcast when a user connects
-//   io.to(user.room).emit("roomUsers", {
-//     room: user.room,
-//     users: getRoomUsers(user.room),
-//   });
-
   });
 
-
-
-
- 
   socket.on("chatMessage", (msg) => {
     const user = getCurrentUser(socket.id);
-    console.log(user)
+    console.log(user);
     io.to(user.room).emit("message", formatMessage(user.username, msg));
   });
-
-
 
   // this will run when the user disconnects
   socket.on("disconnect", () => {
