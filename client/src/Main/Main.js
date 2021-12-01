@@ -18,7 +18,6 @@ const Main = () => {
 
   const navigate = useNavigate();
 
-
   const handleInputChange = (e) => {
     const { value } = e.target;
     setNewMessage(value);
@@ -27,7 +26,7 @@ const Main = () => {
   const handleMessages = (e) => {
     e.preventDefault();
     const trimmed = newMessage.trim();
-    console.log(socket)
+    console.log(socket);
     if (!trimmed) {
       return false;
     }
@@ -35,8 +34,6 @@ const Main = () => {
 
     e.target.elements.msg.value = "";
     e.target.elements.msg.focus();
-
-  
   };
 
   const chatContextObj = {
@@ -62,14 +59,16 @@ const Main = () => {
     },
   };
 
- const handleLeave = () => {
-  const leaveRoom = window.confirm("Are you sure you want to leave the chatroom?");
-  if (leaveRoom) {
-    socket.disconnect();
-    navigate("/");
-  } else {
-  }
- }
+  const handleLeave = () => {
+    const leaveRoom = window.confirm(
+      "Are you sure you want to leave the chatroom?"
+    );
+    if (leaveRoom) {
+      socket.disconnect();
+      navigate("/");
+    } else {
+    }
+  };
 
   useEffect(() => {
     socket.on("roomUsers", ({ room, users }) => {
@@ -78,7 +77,7 @@ const Main = () => {
     });
 
     socket.on("message", (message) => {
-      messages.push(message)
+      messages.push(message);
       setRefresh({ ...resfresh, count: resfresh.count + 1 });
       // Scroll down after message is appended scroll down
       const chatMessages = document.querySelector(".chat-messages");
