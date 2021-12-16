@@ -18,7 +18,6 @@ const Main = () => {
 
   const navigate = useNavigate();
 
-
   const handleInputChange = (e) => {
     const { value } = e.target;
     setNewMessage(value);
@@ -27,7 +26,7 @@ const Main = () => {
   const handleMessages = (e) => {
     e.preventDefault();
     const trimmed = newMessage.trim();
-    console.log(socket)
+    // console.log(socket);
     if (!trimmed) {
       return false;
     }
@@ -35,8 +34,6 @@ const Main = () => {
 
     e.target.elements.msg.value = "";
     e.target.elements.msg.focus();
-
-  
   };
 
   const chatContextObj = {
@@ -48,7 +45,7 @@ const Main = () => {
     handleChatRoom: (e) => {
       const { value } = e.target;
       setChatRoom(value);
-      console.log(room);
+      // console.log(room);
     },
     handleSubmit: () => {
       // validating for username and room
@@ -62,29 +59,35 @@ const Main = () => {
     },
   };
 
- const handleLeave = () => {
-  const leaveRoom = window.confirm("Are you sure you want to leave the chatroom?");
-  if (leaveRoom) {
-    socket.disconnect();
-    navigate("/");
-  } else {
-  }
- }
+  const handleLeave = () => {
+    const leaveRoom = window.confirm(
+      "Are you sure you want to leave the chatroom?"
+    );
+    if (leaveRoom) {
+      socket.disconnect();
+      navigate("/");
+    } else {
+    }
+  };
 
   useEffect(() => {
+    console.log("connection works");
     socket.on("roomUsers", ({ room, users }) => {
-      setUsers(users);
+      // console.log(users);
+      const userNames = users.map(u => u.username);
+      setUsers(userNames);
       setRoomName(room);
     });
 
     socket.on("message", (message) => {
-      messages.push(message)
+      messages.push(message);
       setRefresh({ ...resfresh, count: resfresh.count + 1 });
       // Scroll down after message is appended scroll down
       const chatMessages = document.querySelector(".chat-messages");
       chatMessages.scrollTop = chatMessages.scrollHeight;
     });
   }, [socket]);
+
 
   return (
     <div>
