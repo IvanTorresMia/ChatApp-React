@@ -13,8 +13,10 @@ const ChatRoom = ({
   const [render, setReder] = useState({ count: 0 });
   useEffect(() => {
     setReder({ ...render, count: refresh.count + 1 });
-    console.log("hi");
+    // console.log("hi");
   }, [refresh]);
+
+  console.log(users)
 
   return (
     <div className="chat-container">
@@ -40,7 +42,7 @@ const ChatRoom = ({
           </h3>
           <ul id="users">
             {users.map((user, i) => (
-              <li key={i}>{user.username}</li>
+              <li key={i}>{user}</li>
             ))}
           </ul>
         </div>
