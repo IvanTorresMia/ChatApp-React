@@ -10,6 +10,10 @@ module.exports = (sequelize, DataTypes) => {
         room: {
             type: DataTypes.STRING,
             allownull: false
+        },
+        socketId: {
+            type: DataTypes.STRING,
+            allownull: false
         }
     });
 
