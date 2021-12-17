@@ -25,6 +25,7 @@ const io = socketio(server, {
 const PORT = 4200 || process.env.PORT;
 
 const db = require("./models");
+const { read } = require("fs");
 
 // set static folder
 // app.use(express.static(path.join(__dirname, "public")));
@@ -41,24 +42,17 @@ io.on("connect", (socket) => {
   socket.on("joinRoom", ({ username, room }) => {
     console.log(room, username);
     console.log("join room works");
-    // here we are using the userJoin function from the user file
-    // we are passing in the socket id username and room
-    // this is where I would make a model and back end for this
-    // const user = userJoin(socket.id, username, room);
 
     db.User.create({
       username: username,
       room: room,
+      socketId: socket.id,
     }).then((res) => {
       db.User.findAll({
         where: {
           room: res.dataValues.room,
         },
       }).then((response) => {
-        // console.log(response[0].dataValues);
-        // console.log(res.dataValues.room);
-        // console.log(res.dataValues.username);
-
         socket.join(res.dataValues.room);
 
         socket.emit("message", formatMessage(botName, "Welcome to the chat"));
@@ -79,6 +73,60 @@ io.on("connect", (socket) => {
         });
       });
     });
+  });
+
+  socket.on("chatMessage", (msg) => {
+
+    db.User.findOne({
+      where: {
+        socketId: socket.id,
+      },
+    }).then((res) => {
+      console.log(res.dataValues);
+      db.Message.create({
+        text: msg,
+        username: res.dataValues.username,
+        timeSubmited: moment().format("h:mm a"),
+        UserId: res.dataValues.id,
+      }).then((response) => {
+        let message = {
+          username: response.dataValues.username,
+          text: response.dataValues.text,
+          time: response.dataValues.timeSubmited,
+        };
+
+        io.to(res.dataValues.room).emit("message", message);
+      });
+    });
+  });
+
+  // this will run when the user disconnects
+  // start
+  socket.on("disconnect", () => {
+    const user = userLeave(socket.id);
+
+    if (user) {
+      io.to(user.room).emit(
+        "message",
+        formatMessage(botName, `${user.username} has disconnected`)
+      );
+
+      // Broadcast when a user connects
+      io.to(user.room).emit("roomUsers", {
+        room: user.room,
+        users: getRoomUsers(user.room),
+      });
+    }
+  });
+  // end
+});
+
+db.sequelize.sync({ force: true }).then(() => {
+  server.listen(PORT, () => console.log("Server is listening on port " + PORT));
+});
+
+
+
 
     // socket.join(user.room);
 
@@ -96,32 +144,3 @@ io.on("connect", (socket) => {
     //   room: user.room,
     //   users: getRoomUsers(user.room),
     // });
-  });
-
-  socket.on("chatMessage", (msg) => {
-    const user = getCurrentUser(socket.id);
-    console.log(user);
-    io.to(user.room).emit("message", formatMessage(user.username, msg));
-  });
-
-  // this will run when the user disconnects
-  socket.on("disconnect", () => {
-    const user = userLeave(socket.id);
-
-    if (user) {
-      io.to(user.room).emit(
-        "message",
-        formatMessage(botName, `${user.username} has disconnected`)
-      );
-      // Broadcast when a user connects
-      io.to(user.room).emit("roomUsers", {
-        room: user.room,
-        users: getRoomUsers(user.room),
-      });
-    }
-  });
-});
-
-db.sequelize.sync({ force: true }).then(() => {
-  server.listen(PORT, () => console.log("Server is listening on port " + PORT));
-});
