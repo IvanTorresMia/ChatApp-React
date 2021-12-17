@@ -26,12 +26,11 @@ const Main = () => {
   const handleMessages = (e) => {
     e.preventDefault();
     const trimmed = newMessage.trim();
-    // console.log(socket);
+
     if (!trimmed) {
       return false;
     }
     socket.emit("chatMessage", trimmed);
-
     e.target.elements.msg.value = "";
     e.target.elements.msg.focus();
   };
@@ -73,7 +72,6 @@ const Main = () => {
   useEffect(() => {
     console.log("connection works");
     socket.on("roomUsers", ({ room, users }) => {
-      // console.log(users);
       const userNames = users.map(u => u.username);
       setUsers(userNames);
       setRoomName(room);
