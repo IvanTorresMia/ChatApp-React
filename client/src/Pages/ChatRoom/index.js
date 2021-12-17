@@ -13,7 +13,6 @@ const ChatRoom = ({
   const [render, setReder] = useState({ count: 0 });
   useEffect(() => {
     setReder({ ...render, count: refresh.count + 1 });
-    // console.log("hi");
   }, [refresh]);
 
   console.log(users)
