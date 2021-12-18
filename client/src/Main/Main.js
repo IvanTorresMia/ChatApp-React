@@ -16,7 +16,23 @@ const Main = () => {
   const [newMessage, setNewMessage] = useState("");
   const [resfresh, setRefresh] = useState({ count: 0 });
 
+
+  const [newSocket, setNewSocket] = useState(null);
+
   const navigate = useNavigate();
+
+useEffect(() => {
+
+  const currentSocket = socketIOClient.connect("http://localhost:4200");
+
+  setNewSocket(currentSocket);
+
+  return () => currentSocket.close();
+
+}, []);
+
+
+
 
   const handleInputChange = (e) => {
     const { value } = e.target;
@@ -70,7 +86,6 @@ const Main = () => {
   };
 
   useEffect(() => {
-    console.log("connection works");
     socket.on("roomUsers", ({ room, users }) => {
       const userNames = users.map(u => u.username);
       setUsers(userNames);
@@ -80,7 +95,6 @@ const Main = () => {
     socket.on("message", (message) => {
       messages.push(message);
       setRefresh({ ...resfresh, count: resfresh.count + 1 });
-      // Scroll down after message is appended scroll down
       const chatMessages = document.querySelector(".chat-messages");
       chatMessages.scrollTop = chatMessages.scrollHeight;
     });
@@ -104,6 +118,7 @@ const Main = () => {
                 socketUser={socket}
                 refresh={resfresh}
                 handleLeave={handleLeave}
+                currentSocket={newSocket}
               />
             }
           />
