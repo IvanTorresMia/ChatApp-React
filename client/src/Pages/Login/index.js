@@ -16,7 +16,7 @@ const Login = () => {
         </h1>
       </header>
       <main className="join-main">
-        <form action="chat.html" onSubmit={context.handleSubmit}>
+        <form action="chat.html">
           <div className="form-control">
             <label htmlFor="username">Username</label>
             <input

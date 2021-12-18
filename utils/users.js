@@ -1,4 +1,20 @@
-const users = [];
+const users = [
+  {
+    id: 1,
+    username: "ivan",
+    room: "Js"
+  },
+  {
+    id: 2,
+    username: "angel",
+    room: "Js"
+  },
+  {
+    id: 3,
+    username: "josh",
+    room: "Js"
+  }
+];
 // join user to chat
 
 function userJoin(id, username, room) {
@@ -14,12 +30,17 @@ function getCurrentUser(id) {
 }
 
 function userLeave(id) {
+  // if the user id equlas to this then return him
   const index = users.findIndex((user) => user.id === id);
 
+  // then take him off.
   if (index !== -1) {
     return users.splice(index, 1)[0];
   }
 }
+
+console.log(userLeave(2));
+
 
 // get room users
 function getRoomUsers(room) {
