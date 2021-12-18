@@ -6,16 +6,23 @@ const ChatRoom = ({
   messages,
   handleMessages,
   handleInputChange,
-  socketUser,
   refresh,
-  handleLeave
+  handleLeave,
+  currentSocket
 }) => {
   const [render, setReder] = useState({ count: 0 });
   useEffect(() => {
     setReder({ ...render, count: refresh.count + 1 });
   }, [refresh]);
 
-  console.log(users)
+  console.log(currentSocket.id);
+
+
+
+  
+
+
+
 
   return (
     <div className="chat-container">
