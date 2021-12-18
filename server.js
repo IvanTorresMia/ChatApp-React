@@ -5,12 +5,6 @@ const socketio = require("socket.io");
 const formatMessage = require("./utils/messages");
 const moment = require("moment");
 const cors = require("cors");
-const {
-  userJoin,
-  getCurrentUser,
-  userLeave,
-  getRoomUsers,
-} = require("./utils/users");
 
 const app = express();
 app.use(cors());
@@ -25,7 +19,6 @@ const io = socketio(server, {
 const PORT = 4200 || process.env.PORT;
 
 const db = require("./models");
-const { read } = require("fs");
 
 // set static folder
 // app.use(express.static(path.join(__dirname, "public")));
@@ -39,9 +32,11 @@ const botName = "ChatCord Bot";
 // Run when a client connects
 io.on("connect", (socket) => {
   console.log("new socket connection");
+
+  console.log(socket.id);
+
   socket.on("joinRoom", ({ username, room }) => {
-    console.log(room, username);
-    console.log("join room works");
+
 
     db.User.create({
       username: username,
@@ -76,13 +71,12 @@ io.on("connect", (socket) => {
   });
 
   socket.on("chatMessage", (msg) => {
-
     db.User.findOne({
       where: {
         socketId: socket.id,
       },
     }).then((res) => {
-      console.log(res.dataValues);
+      // console.log(res.dataValues);
       db.Message.create({
         text: msg,
         username: res.dataValues.username,
@@ -102,19 +96,43 @@ io.on("connect", (socket) => {
 
   // this will run when the user disconnects
   // start
-  socket.on("disconnect", () => {
-    const user = userLeave(socket.id);
+  socket.on("disconnect", (reason) => {
+    // const user = userLeave(socket.id);
 
-    if (user) {
-      io.to(user.room).emit(
-        "message",
-        formatMessage(botName, `${user.username} has disconnected`)
-      );
+    if (reason === "client namespace disconnect") {
+      // console.log("hi");
+      // console.log(reason);
+      // console.log("disconnect was called");
+      db.User.findOne({
+        where: {
+          socketId: socket.id,
+        },
+      }).then((userResponse) => {
+        const user = userResponse.dataValues;
 
-      // Broadcast when a user connects
-      io.to(user.room).emit("roomUsers", {
-        room: user.room,
-        users: getRoomUsers(user.room),
+        if (user) {
+          io.to(user.room).emit(
+            "message",
+            formatMessage(botName, `${user.username} has disconnected`)
+          );
+          db.User.destroy({
+            where: {
+              socketId: user.socketId,
+            },
+          }).then((res) => {
+            db.User.findAll({
+              where: {
+                room: user.room,
+              },
+            }).then((roomUsers) => {
+              // Broadcast when a user connects
+              io.to(user.room).emit("roomUsers", {
+                room: user.room,
+                users: roomUsers,
+              });
+            });
+          });
+        }
       });
     }
   });
@@ -125,22 +143,42 @@ db.sequelize.sync({ force: true }).then(() => {
   server.listen(PORT, () => console.log("Server is listening on port " + PORT));
 });
 
+// socket.join(user.room);
 
+// after the user joins we emmit a message
+// socket.emit("message", formatMessage(botName, "Welcome to the chat"));
+// broadacast when a user connects. this is for every client except for the current client
+// socket.broadcast
+//   .to(user.room)
+//   .emit(
+//     "message",
+//     formatMessage(botName, `${user.username} has joined the chat`)
+//   );
+// Broadcast when a user connects
+// io.to(user.room).emit("roomUsers", {
+//   room: user.room,
+//   users: getRoomUsers(user.room),
+// });
 
+// db.User.destroy({
+//   where: {
+//     socketId: socket.id
+//   }
+// }).then(res => {
+//   console.log("hi");
+//   console.log(res);
+//   console.log("Hello");
+// });
 
-    // socket.join(user.room);
+// if (user) {
+//   io.to(user.room).emit(
+//     "message",
+//     formatMessage(botName, `${user.username} has disconnected`)
+//   );
 
-    // after the user joins we emmit a message
-    // socket.emit("message", formatMessage(botName, "Welcome to the chat"));
-    // broadacast when a user connects. this is for every client except for the current client
-    // socket.broadcast
-    //   .to(user.room)
-    //   .emit(
-    //     "message",
-    //     formatMessage(botName, `${user.username} has joined the chat`)
-    //   );
-    // Broadcast when a user connects
-    // io.to(user.room).emit("roomUsers", {
-    //   room: user.room,
-    //   users: getRoomUsers(user.room),
-    // });
+//   // Broadcast when a user connects
+//   io.to(user.room).emit("roomUsers", {
+//     room: user.room,
+//     users: getRoomUsers(user.room),
+//   });
+// }
